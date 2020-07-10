@@ -26,7 +26,9 @@ public class MovieInput: ImageSource {
         
         assetReader = try AVAssetReader(asset:self.asset)
         
-        let outputSettings:[String:AnyObject] = [(kCVPixelBufferPixelFormatTypeKey as String):NSNumber(value:Int32(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange))]
+        let outputSettings:[String:Any] = [
+            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
+        ]
         let readerVideoTrackOutput = AVAssetReaderTrackOutput(track:self.asset.tracks(withMediaType: AVMediaType.video)[0], outputSettings:outputSettings)
         readerVideoTrackOutput.alwaysCopiesSampleData = false
         assetReader.add(readerVideoTrackOutput)

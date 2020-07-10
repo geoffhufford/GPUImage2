@@ -35,7 +35,7 @@ public class MovieOutput: ImageConsumer, AudioEncodingTarget {
         }
     }
     
-    public init(URL:Foundation.URL, size:Size, fileType:AVFileType = AVFileType.mov, liveVideo:Bool = false, settings:[String:AnyObject]? = nil) throws {
+    public init(URL:Foundation.URL, size:Size, fileType:AVFileType = AVFileType.mov, liveVideo:Bool = false, settings:[String:Any]? = nil) throws {
         if sharedImageProcessingContext.supportsTextureCaches() {
             self.colorSwizzlingShader = sharedImageProcessingContext.passthroughShader
         } else {
@@ -47,25 +47,25 @@ public class MovieOutput: ImageConsumer, AudioEncodingTarget {
         // Set this to make sure that a functional movie is produced, even if the recording is cut off mid-stream. Only the last second should be lost in that case.
         assetWriter.movieFragmentInterval = CMTime(seconds: 1, preferredTimescale: 1000)
         
-        var localSettings:[String:AnyObject]
-        if let settings = settings {
-            localSettings = settings
+        var localSettings = settings ?? [:]
+        localSettings[AVVideoWidthKey] = localSettings[AVVideoWidthKey] ?? size.width
+        localSettings[AVVideoHeightKey] = localSettings[AVVideoHeightKey] ?? size.height
+        if #available(iOS 11.0, *) {
+            localSettings[AVVideoCodecKey] =  localSettings[AVVideoCodecKey] ?? AVVideoCodecType.h264
         } else {
-            localSettings = [String:AnyObject]()
+            localSettings[AVVideoCodecKey] =  localSettings[AVVideoCodecKey] ?? AVVideoCodecH264
         }
-        
-        localSettings[AVVideoWidthKey] = localSettings[AVVideoWidthKey] ?? NSNumber(value:size.width)
-        localSettings[AVVideoHeightKey] = localSettings[AVVideoHeightKey] ?? NSNumber(value:size.height)
-        localSettings[AVVideoCodecKey] =  localSettings[AVVideoCodecKey] ?? AVVideoCodecH264 as NSString
-        
+
         assetWriterVideoInput = AVAssetWriterInput(mediaType:AVMediaType.video, outputSettings:localSettings)
         assetWriterVideoInput.expectsMediaDataInRealTime = liveVideo
         encodingLiveVideo = liveVideo
         
         // You need to use BGRA for the video in order to get realtime encoding. I use a color-swizzling shader to line up glReadPixels' normal RGBA output with the movie input's BGRA.
-        let sourcePixelBufferAttributesDictionary:[String:AnyObject] = [kCVPixelBufferPixelFormatTypeKey as String:NSNumber(value:Int32(kCVPixelFormatType_32BGRA)),
-                                                                        kCVPixelBufferWidthKey as String:NSNumber(value:size.width),
-                                                                        kCVPixelBufferHeightKey as String:NSNumber(value:size.height)]
+        let sourcePixelBufferAttributesDictionary:[String:Any] = [
+            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
+            kCVPixelBufferWidthKey as String: size.width,
+            kCVPixelBufferHeightKey as String: size.height
+        ]
         
         assetWriterPixelBufferInput = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput:assetWriterVideoInput, sourcePixelBufferAttributes:sourcePixelBufferAttributesDictionary)
         assetWriter.add(assetWriterVideoInput)
