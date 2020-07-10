@@ -1,17 +1,17 @@
 import Foundation
 
 public var standardProcessingQueue:DispatchQueue {
-if #available(iOS 10, OSX 10.10, *) {
+    if #available(iOS 8.0, OSX 10.10, *) {
         return DispatchQueue.global(qos: .default)
-} else {
+    } else {
         return DispatchQueue.global(priority: .default)
     }
 }
 
 public var lowProcessingQueue:DispatchQueue {
-if #available(iOS 10, OSX 10.10, *) {
+    if #available(iOS 8.0, OSX 10.10, *) {
         return DispatchQueue.global(qos: .background)
-} else {
+    } else {
         return DispatchQueue.global(priority: .low)
     }
 }
