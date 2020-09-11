@@ -24,7 +24,12 @@ public struct ShaderUniformSettings {
         get { return uniformValues[index] as? Float}
         set(newValue) { uniformValues[index] = newValue }
     }
-    
+
+    public subscript(index:String) -> [Float]? {
+        get { return uniformValues[index] as? [Float]}
+        set(newValue) { uniformValues[index] = newValue }
+    }
+
     public subscript(index:String) -> Int? {
         get { return uniformValues[index] as? Int }
         set(newValue) { uniformValues[index] = newValue }
@@ -59,6 +64,7 @@ public struct ShaderUniformSettings {
         for (uniform, value) in uniformValues {
             switch value {
                 case let value as Float: shader.setValue(GLfloat(value), forUniform:uniform)
+                case let value as [Float]: shader.setValue(value, forUniform:uniform)
                 case let value as Int: shader.setValue(GLint(value), forUniform:uniform)
                 case let value as Color: shader.setValue(value, forUniform:uniform)
                 case let value as Position: shader.setValue(value.toGLArray(), forUniform:uniform)
