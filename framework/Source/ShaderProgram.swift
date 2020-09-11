@@ -159,7 +159,10 @@ public class ShaderProgram {
             } else if (value.count == 4) {
                 glUniform4fv(uniformAddress, 1, value)
             } else {
-                fatalError("Tried to set a float array uniform outside of the range of values")
+                //fatalError("Tried to set a float array uniform outside of the range of values")
+
+                /// @geoffhufford, Ability to pass array of GLfloat to filter
+                glUniform1fv(uniformAddress, GLsizei(value.count), value)
             }
             currentUniformFloatArrayValues[forUniform] = value
         }
